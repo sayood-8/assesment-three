@@ -11,13 +11,11 @@ interface Action{
 }
 
 function reducer(state :State , action:Action){
-    const {type} = action;
     const inputElement = document.getElementById("inp") as HTMLInputElement;
     const inputValue: string = inputElement.value;
-    console.log(inputValue);
-    switch (type){
+    switch (action.type){
         case "add" :{
-            return {...state, todo : (state.todo = inputValue )  }
+            return {...state , todo : (state.todo = inputValue )  }
         }
         case "remove" :{
             return {...state, todo : ("")  }
@@ -31,20 +29,20 @@ export default function Demo(){
             todo : ""
         }
     );
+
     return(
         <>
-        <div>
-            <input type="text"  id = "inp" placeholder="Enter your username"/>
+        <br></br>
+        <section>
+            <input type="text"  id = "inp" placeholder="Enter your task" className="border-2  border-black rounded-full  text-center text-black  " />
             <br></br>
-            <button className = {styles.button1} onClick={() => dispatch({type: 'add'})}>add</button>
-            <button className = {styles.button2} onClick={() => dispatch({type: 'remove'})}>remove</button>
-        </div>
-        <div>
-            <p className={styles.start}>Tasks:</p>
-            
-            <pre>{state.todo}</pre>
+            <button className = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => dispatch({type: 'add'})}>add</button>
+            <button className = "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onClick={() => dispatch({type: 'remove'})}>remove</button>
+        </section>
 
-            
+        <div>
+            <p className="text-base text-black border-2  border-black rounded-full  text-center w-5/12 bg-blue-400  ">Tasks:</p>
+            <p className="text-black">{state.todo}</p>
         </div>
         </>
     )

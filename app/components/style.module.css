@@ -37,3 +37,14 @@ color: #222222;
     display: inline-block;
     font-size: 25px;
 }
+.input{
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    color : black;
+    
+}
+.div{
+    color: black;
+}
