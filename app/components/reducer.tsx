@@ -1,49 +1,77 @@
 import { useReducer, useState } from "react";
-import styles from "./style.module.css"
-import { todo } from "node:test";
-import { count } from "console";
+import styles from "./style.module.css";
+
+interface Todo {
+    task: string;
+    completed: boolean;
+}
 
 interface State {
-    todo : string;
-}
-interface Action{
-    type : 'add' | 'remove';
+    todos: Todo[];
+    count: number;
 }
 
-function reducer(state :State , action:Action){
-    const inputElement = document.getElementById("inp") as HTMLInputElement;
-    const inputValue: string = inputElement.value;
-    switch (action.type){
-        case "add" :{
-            return {...state , todo : (state.todo = inputValue )  }
+interface Action {
+    type: 'add' | 'remove' | 'toggle';
+    text?: string;
+    index?:number;
+}
+
+function reducer(state: State, action: Action): State {
+    switch (action.type) {
+        case "add": {
+            if (action.text) {
+                return {
+                    ...state,
+                    todos: [...state.todos, { task: action.text, completed: false }]
+                };
+            }
+            return state;
         }
-        case "remove" :{
-            return {...state, todo : ("")  }
-        }        
-    }  
+        case "toggle": {
+            if (action.index !== undefined) {
+                return {
+                    ...state,
+                    todos: state.todos.map((todo, i) =>
+                        i === action.index ? { ...todo, completed: !todo.completed } : todo
+                    )
+                };
+            }
+            return state;
+        }
+        case "remove":{
+            return{todos:state.todos.filter((task,index) => index !== action.index)}
+        }
+        default:
+            return state;
+    }
 }
 
-export default function Demo(){
-    const [state , dispatch] = useReducer(reducer , 
-        {
-            todo : ""
-        }
-    );
+export default function Demo() {
+    const [{ todos, count }, dispatch] = useReducer(reducer, {
+        todos: [],
+        count: 0
+    });
+    const [text, setText] = useState('');
 
-    return(
+    return (
         <>
-        <br></br>
-        <section>
-            <input type="text"  id = "inp" placeholder="Enter your task" className="border-2  border-black rounded-full  text-center text-black  " />
+            <form onSubmit={e => { e.preventDefault(); dispatch({ type: "add", text }); setText(""); }}>
+                <input type="text" value={text} onChange={e => setText(e.target.value) } placeholder="enter your task" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"/>
+            </form>
             <br></br>
-            <button className = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => dispatch({type: 'add'})}>add</button>
-            <button className = "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onClick={() => dispatch({type: 'remove'})}>remove</button>
-        </section>
-
-        <div>
-            <p className="text-base text-black border-2  border-black rounded-full  text-center w-5/12 bg-blue-400  ">Tasks:</p>
-            <p className="text-black">{state.todo}</p>
-        </div>
+            <ul className="text-black "  >
+                {todos.map((todo, index) => (
+                    <li key={index} 
+                    className="text-black border border-black rounded-full text-center w-5/12 bg-violet-500"
+                    style = {{textDecoration:todo.completed ? "line-through"  : ""}}
+                    onClick ={() => dispatch ({type:'toggle' ,index})} 
+                    onDoubleClick={() => dispatch ({type: 'remove',index})}
+                     >
+                        {todo.task}
+                        </li>
+                ))}
+            </ul>
         </>
-    )
+    );
 }
